@@ -1,0 +1,4 @@
+/* Noto Sans SC (variable, weight 400–700) and ZCOOL XiaoWei, subset to the characters used by this project.
+   SIL Open Font License 1.1 (see OFL-NotoSansSC.txt, OFL-ZCOOLXiaoWei.txt). */
+@font-face { font-family: 'Noto Sans SC'; font-style: normal; font-weight: 400 700; font-display: swap; src: url('NotoSansSC-subset.woff2') format('woff2'); }
+@font-face { font-family: 'ZCOOL XiaoWei'; font-style: normal; font-weight: 400; font-display: swap; src: url('ZCOOLXiaoWei-subset.woff2') format('woff2'); }

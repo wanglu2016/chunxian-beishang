@@ -1,0 +1,930 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>春线北上</title>
+<meta name="description" content="按国家标准《气候季节划分》，用中国562个气象站1957–2020年的逐日气温，画出每年春天从华南推向北方的“春线”，并对比1960年前后与2010年代、叠加二十四节气。">
+<meta property="og:title" content="春线北上 · 中国入春地图">
+<meta property="og:description" content="拖动日历，看春天每天走到哪里；和六十年前比，入春中位数提前了9天。">
+<meta property="og:image" content="assets/preview.jpg">
+<meta name="theme-color" content="#f3f5f1">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
+<link rel="stylesheet" href="assets/fonts/fonts.css">
+<style>
+/* Layout: an atlas plate. Map is the plate, calendar strip under it reads like a 节气 almanac; station card on the side. */
+:root{
+  --paper:#f3f5f1; --panel:#fbfcfa; --ink:#1b2420; --ink2:#4b5751; --muted:#76817b; --rule:#d5dbd5;
+  --winter:#dbe1e7; --nospring:#eef1f4; --land:#e6e9e4; --world:#b9c0bb; --border:#36413b; --prov:rgba(255,255,255,.78);
+  --accent:#cf3468; --accent-ink:#b02656; --e1:#3a6ba6; --halo:#f3f5f1;
+  --s0:#d8ecb2; --s1:#b4da8c; --s2:#8bc56d; --s3:#62a955; --s4:#418a45; --s5:#2a6b38;
+  --dv-e3:#9e2655; --dv-e2:#d24a7d; --dv-e1:#ec9bb9; --dv-0:#e7e8e3; --dv-l1:#a9c8e8; --dv-l2:#5f93cc;
+  --f-display:"ZCOOL XiaoWei","Songti SC","STSong","Noto Serif SC",serif;
+  --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#121714; --panel:#18201b; --ink:#e7ede8; --ink2:#b3bfb7; --muted:#859189; --rule:#2b352f;
+  --winter:#2a333b; --nospring:#20272d; --land:#232b26; --world:#4a544e; --border:#c8d2cc; --prov:rgba(10,14,12,.55);
+  --accent:#ff6f9c; --accent-ink:#ff8fb1; --e1:#7aa7e0; --halo:#121714;
+  --s0:#dbf19f; --s1:#b0dc7f; --s2:#82c466; --s3:#58a755; --s4:#3d8a48; --s5:#2b6c3b;
+  --dv-e3:#ff7aa6; --dv-e2:#d9517f; --dv-e1:#8a3a58; --dv-0:#363c39; --dv-l1:#3c5f86; --dv-l2:#6fa3dc;
+  color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --paper:#121714; --panel:#18201b; --ink:#e7ede8; --ink2:#b3bfb7; --muted:#859189; --rule:#2b352f;
+  --winter:#2a333b; --nospring:#20272d; --land:#232b26; --world:#4a544e; --border:#c8d2cc; --prov:rgba(10,14,12,.55);
+  --accent:#ff6f9c; --accent-ink:#ff8fb1; --e1:#7aa7e0; --halo:#121714;
+  --s0:#dbf19f; --s1:#b0dc7f; --s2:#82c466; --s3:#58a755; --s4:#3d8a48; --s5:#2b6c3b;
+  --dv-e3:#ff7aa6; --dv-e2:#d9517f; --dv-e1:#8a3a58; --dv-0:#363c39; --dv-l1:#3c5f86; --dv-l2:#6fa3dc;
+  color-scheme:dark;}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.65;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+.wrap{max-width:1180px;margin:0 auto}
+header{padding-block:28px 14px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 32px;align-items:end}
+.eyebrow{font-size:12px;letter-spacing:.14em;color:var(--muted);grid-column:1/-1}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(40px,7vw,64px);line-height:1;margin:0;letter-spacing:.06em}
+.lede{grid-column:1;margin:6px 0 0;max-width:40em;color:var(--ink2);text-wrap:pretty}
+.headline{grid-column:2;grid-row:2/4;display:flex;flex-wrap:wrap;gap:12px 22px;align-items:flex-end}
+.hstat{display:grid;gap:2px;min-width:0}
+.hstat b{font-family:var(--f-display);font-weight:400;font-size:44px;line-height:1;color:var(--accent-ink)}
+.hstat b small{font-size:18px;margin-left:2px}
+.hstat span{font-size:12px;color:var(--muted);max-width:11em;line-height:1.45}
+@media (max-width:760px){header{grid-template-columns:1fr}.headline{grid-column:1;grid-row:auto;margin-top:8px}.hstat b{font-size:36px}}
+
+.plate{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:20px;align-items:start}
+@media (max-width:980px){.plate{grid-template-columns:minmax(0,1fr)}}
+.stage{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:14px 14px 10px;min-width:0}
+.bar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:999px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{font:inherit;font-size:14px;border:0;background:transparent;color:var(--ink2);padding:5px 13px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.seg button:focus-visible,.btn:focus-visible,input:focus-visible,select:focus-visible,tr:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.yearbox{display:inline-flex;align-items:center;gap:6px;font-size:14px;color:var(--ink2)}
+.yearbox[hidden]{display:none!important}
+.btn{font:inherit;border:1px solid var(--rule);background:var(--panel);color:var(--ink);border-radius:6px;padding:3px 9px;cursor:pointer;font-size:14px;line-height:1.4}
+select{font:inherit;font-size:14px;color:var(--ink);background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:3px 6px}
+.readout{display:flex;align-items:baseline;gap:10px;margin:12px 2px 2px;flex-wrap:wrap}
+.readout .date{font-family:var(--f-display);font-size:30px;line-height:1}
+.readout .term{font-size:15px;color:var(--accent-ink)}
+.readout .note{font-size:13px;color:var(--muted);margin-left:auto}
+
+.map{position:relative;width:100%;margin-top:6px}
+.map>svg,.map>canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.map .ov{cursor:crosshair}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:12.5px;color:var(--ink2);margin:8px 2px 0;align-items:center}
+.legend .k{display:inline-flex;align-items:center;gap:6px}
+.sw{width:22px;height:10px;border-radius:2px;display:inline-block;border:1px solid var(--rule)}
+.ramp{width:120px;height:10px;border-radius:2px;display:inline-block}
+.ln{width:24px;height:0;border-top:2.5px solid var(--accent);display:inline-block}
+.ln.dash{border-top:2px dashed var(--e1)}
+.ln.thin{border-top:1px solid var(--ink2);opacity:.55}
+
+.cal{margin-top:14px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;align-items:center}
+.play{width:40px;height:40px;border-radius:50%;border:1px solid var(--rule);background:var(--panel);color:var(--ink);cursor:pointer;display:grid;place-items:center}
+.play svg{width:16px;height:16px;fill:currentColor}
+.track{position:relative;padding-top:2px}
+input[type=range]{width:100%;accent-color:var(--accent);margin:0}
+.ticks{position:relative;height:30px;font-size:11.5px;color:var(--muted)}
+.ticks span{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap;padding-top:7px}
+.ticks span::before{content:"";position:absolute;left:50%;top:0;height:5px;border-left:1px solid var(--rule)}
+.ticks span.minor{display:none}
+@media (min-width:700px){.ticks span.minor{display:inline}}
+
+.curve{margin-top:6px}
+.curve h3,.side h3{font-size:13px;font-weight:500;color:var(--ink2);margin:0 0 4px;letter-spacing:.04em}
+.curve svg{width:100%;height:auto;display:block;overflow:visible}
+.cap{font-size:12.5px;color:var(--muted)}
+
+.side{display:grid;gap:14px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:14px;min-width:0}
+.search{display:flex;gap:6px}
+.search input{flex:1;min-width:0;font:inherit;font-size:14px;padding:5px 9px;border:1px solid var(--rule);border-radius:6px;background:var(--paper);color:var(--ink)}
+.stname{font-family:var(--f-display);font-size:30px;line-height:1.1;margin:10px 0 2px}
+.stmeta{font-size:12.5px;color:var(--muted)}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;margin:12px 0 6px}
+.cmp div{display:grid;gap:1px}
+.cmp small{font-size:12px;color:var(--muted)}
+.cmp b{font-weight:500;font-size:17px;font-variant-numeric:tabular-nums}
+.cmp i{font-style:normal;font-size:12px;color:var(--ink2)}
+.delta{font-size:14px;color:var(--ink2);margin:4px 0 8px}
+.delta b{color:var(--accent-ink);font-weight:700}
+.stchart svg{width:100%;height:auto;display:block;overflow:visible}
+
+section.block{margin-top:28px}
+h2{font-family:var(--f-display);font-weight:400;font-size:28px;margin:0 0 4px;letter-spacing:.04em}
+.sub{color:var(--ink2);margin:0 0 12px;max-width:46em}
+.tbl{overflow-x:auto;border:1px solid var(--rule);border-radius:6px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:560px}
+th,td{padding:7px 12px;text-align:left;border-bottom:1px solid var(--rule);white-space:nowrap}
+th{font-weight:500;color:var(--muted);font-size:12.5px;cursor:pointer;user-select:none}
+th[aria-sort] ::after{content:""}
+td.n{font-variant-numeric:tabular-nums}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:color-mix(in srgb,var(--accent) 6%,transparent)}
+tbody tr[aria-selected="true"]{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.bar-d{display:inline-block;height:8px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));gap:14px 26px}
+.notes article{min-width:0}
+.notes h3{font-size:15px;margin:0 0 4px;font-weight:700}
+.notes p{margin:0 0 8px;color:var(--ink2);font-size:14px;text-wrap:pretty}
+.notes a{color:var(--accent-ink)}
+.tip{position:absolute;pointer-events:none;background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:7px 10px;font-size:12.5px;line-height:1.5;box-shadow:0 4px 14px rgba(0,0,0,.12);max-width:230px;z-index:5;color:var(--ink)}
+.tip b{font-weight:700}
+.tip .m{color:var(--muted)}
+.loading{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.foot{margin-top:30px;padding-top:14px;border-top:1px solid var(--rule);font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 20px}
+.foot a{color:var(--accent-ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="eyebrow">气象入春 · 中国 562 个气象站 · 1957–2020</div>
+  <h1>春线北上</h1>
+  <p class="lede">按国家标准《气候季节划分》，日平均气温的 5 天滑动平均连续 5 天达到 10℃ 才算入春。把各地入春的日子连成线，就是一条从华南推向北方的“春线”。拖动下面的日历，看它每天走到哪里，再和六十年前比一比。</p>
+  <div class="headline" id="headline"></div>
+</header>
+
+<div class="plate">
+  <div class="stage">
+    <div class="bar">
+      <div class="seg" role="group" aria-label="看哪组数据">
+        <button type="button" data-mode="compare" aria-pressed="true">两代对比</button>
+        <button type="button" data-mode="year" aria-pressed="false">单年</button>
+        <button type="button" data-mode="normal" aria-pressed="false">常年</button>
+        <button type="button" data-mode="diff" aria-pressed="false">提前天数</button>
+      </div>
+      <div class="yearbox" id="yearbox" hidden>
+        <button type="button" class="btn" id="yprev" aria-label="上一年">‹</button>
+        <select id="ysel" aria-label="年份"></select>
+        <button type="button" class="btn" id="ynext" aria-label="下一年">›</button>
+      </div>
+    </div>
+    <div class="readout" aria-live="polite">
+      <span class="date" id="rdDate"></span><span class="term" id="rdTerm"></span><span class="note" id="rdNote"></span>
+    </div>
+    <div class="map" id="map">
+      <svg class="base" id="svgBase" aria-hidden="true"></svg>
+      <canvas id="cv" aria-hidden="true"></canvas>
+      <svg class="ov" id="svgOv" role="img" aria-label="中国入春地图"></svg>
+      <div class="loading" id="loading">正在解压网格数据…</div>
+      <div class="tip" id="tip" hidden></div>
+    </div>
+    <div class="legend" id="legend"></div>
+    <div class="cal" id="cal">
+      <button type="button" class="play" id="play" aria-label="播放"><svg viewBox="0 0 16 16" id="playIcon"><path d="M4 2.5v11l9-5.5z"/></svg></button>
+      <div class="track">
+        <input type="range" id="day" min="1" max="196" step="1" value="95" aria-label="日期">
+        <div class="ticks" id="ticks"></div>
+      </div>
+    </div>
+    <div class="curve" id="curveBox">
+      <h3 id="curveTitle">已入春的国土比例</h3>
+      <svg id="curve" viewBox="0 0 760 150" role="img" aria-label="已入春国土比例随日期变化"></svg>
+      <div class="cap" id="curveCap"></div>
+    </div>
+  </div>
+
+  <aside class="side">
+    <div class="card">
+      <div class="search">
+        <input id="q" list="stlist" placeholder="输入站名，如 西安、漠河" aria-label="查找气象站">
+        <datalist id="stlist"></datalist>
+      </div>
+      <div id="stcard"></div>
+      <div class="stchart"><svg id="stchart" viewBox="0 0 300 210" role="img" aria-label="该站历年入春日"></svg></div>
+      <div class="cap" id="stcap"></div>
+    </div>
+  </aside>
+</div>
+
+<section class="block">
+  <h2>省会城市的春天</h2>
+  <p class="sub">各城市国家气象站的“常年入春日”。两个时期分别按 1957–1964 年、2011–2020 年的平均气温曲线计算，做法和气象部门公布“常年”时一样。点一行，右侧和地图会跳到这个站。</p>
+  <div class="tbl"><table id="tbl">
+    <thead><tr><th data-k="city">城市</th><th data-k="e1">1960年前后</th><th data-k="e2">2010年代</th><th data-k="d" aria-sort="ascending">变化</th><th data-k="n">常年（1991–2020）</th></tr></thead>
+    <tbody></tbody>
+  </table></div>
+  <p class="cap" id="tblcap"></p>
+</section>
+
+<section class="block">
+  <h2>资料与边界</h2>
+  <p class="sub">每类数据从哪里来、怎么处理、哪里不准。</p>
+  <div class="notes">
+    <article>
+      <h3>入春怎么算</h3>
+      <p>依据 GB/T 42074—2022《气候季节划分》（前身为 QX/T 152—2012）。滑动平均取“当天及前 4 天”共 5 天的日平均气温；滑动平均连续 5 天 ≥10℃ 时，在这 5 个滑动值用到的 9 天实测日平均气温里，取第一个 ≥10℃ 的日期作为入春日。</p>
+      <p>标准还要求“二次判断”：入春后若又出现连续 5 天滑动平均 &lt;10℃，就比较两段之间达标与不达标的天数，不达标的多则重判。本页对入冬也做同样判断，否则华南一次 11 月寒潮就会让 12 月“入春”。这一步的细节标准原文我们没能逐条核对，属于本页的实现方式。</p>
+      <p>冬半年（11 月至次年 3 月）始终没出现连续 5 天滑动平均 &lt;10℃，记为<b>无冬</b>；地图上以滑动平均最低的那天作为秋春分界，这只是为了让动画连贯，不是真正的入春日。到 8 月底仍未入春，记为<b>无春</b>（青藏高原高海拔地区）。</p>
+    </article>
+    <article>
+      <h3>气温数据</h3>
+      <p>美国国家海洋和大气管理局（NOAA）的全球地面日值资料 GSOD，通过 GitHub 上的镜像 <a href="https://github.com/CalebBell/gsod" target="_blank" rel="noopener">CalebBell/gsod</a> 获取。它只更新到 2020 年，所以本页止于 2020 年；2021 年以后只需把 NOAA 当年的文件放进同一流程即可补上。</p>
+      <p>GSOD 的日平均气温是当天各次观测的平均，按世界时计日（北京时间 8 时到次日 8 时），与气象部门按北京时间计日略有差别。<b>1965–1972 年中国站点在 GSOD 里几乎整段缺失</b>，所以“1960 年前后”只能用 1957–1964 年；1973 年因为缺前一年秋冬的资料，也没有画成全国地图。</p>
+      <p>只用编号与世界气象组织区站号对应的站点（WMO 区号 45、46、50–59），其余编号混入的记录会被剔除，例如一条标成“武汉”的记录 1 月平均 21℃。</p>
+    </article>
+    <article>
+      <h3>站点与地图</h3>
+      <p>大陆站名、坐标、海拔取自中国气象局开源检验工具 <a href="https://github.com/nmcdev/meteva" target="_blank" rel="noopener">meteva</a> 所附国家站表；港澳台及已撤销的老站号按 NOAA 站点历史，中文名为本页翻译。坐标是现址，历史上的迁站没有逐一处理，个别站（如贵阳）的“推迟”可能来自迁站。</p>
+      <p>国界、省界与南海诸岛线划同样取自 meteva 所附矢量数据，投影为 Albers 等积圆锥（中央经线 105°E，标准纬线 25°N、47°N），因此“国土比例”可以直接按格点数算。这张底图仅作示意；若要在中国大陆公开发布，应换用自然资源部标准地图服务的底图并标注审图号。</p>
+    </article>
+    <article>
+      <h3>地图上的面是怎么来的</h3>
+      <p>站点之间靠插值：先把全国分成 20 公里的格子，每天对所有站点做“气温 ~ 纬度 + 海拔”回归，残差再按最近 10 个站反距离平方插值，海拔取 meteva 所附 1 公里地形数据；然后对每个格子按上面的规则判定入春。</p>
+      <p>“两代对比”只用两个时期资料都完整的 221 个站，避免站点增减造成假变化。新疆南部、青藏高原西部站点稀少，那里的线是推算出来的，看大势即可，不要细读。</p>
+    </article>
+    <article>
+      <h3>和官方结果对得上吗</h3>
+      <p>北京 1981–2010 年常年入春日，本页 3 月 30 日，北京市气象台公布 3 月 30 日；1991–2020 年常年，本页 3 月 25 日，官方 3 月 26 日；2018 年入春，本页与官方都是 3 月 22 日；2020 年本页 3 月 18 日，官方 3 月 15 日。</p>
+      <p>临界年份可能差很多：上海 2016 年官方 2 月 9 日入春，是有记录以来最早；本页用 GSOD 资料，2 月中旬一次强冷空气让滑动平均只连续 4 天达标，结果成了 3 月 16 日。单站单年的日期请当作“大致”，看多年和大范围的变化更可靠。</p>
+    </article>
+    <article>
+      <h3>还要记住的</h3>
+      <p>大城市站的提前有一部分来自城市热岛。二十四节气按太阳视黄经逐年计算（北京时间），同一节气在不同年份会差一天左右；“两代对比”和“常年”用的是 1957–2020 年的平均节气日期。</p>
+      <p>入春是气温意义上的春天，和物候（开花、返青）、农事上的春天不是一回事。</p>
+    </article>
+  </div>
+</section>
+<footer class="foot">
+  <span>春线北上 · 数据 NOAA GSOD 1957–2020 · 方法 GB/T 42074—2022</span>
+  <a href="https://wanglu2016.github.io/chunxian-beishang/video.html">使用讲解视频</a>
+  <a href="https://github.com/wanglu2016/chunxian-beishang">源代码与离线版下载</a>
+</footer>
+</div>
+
+<script src="assets/vendor/d3.min.js"></script>
+<script src="assets/vendor/pako.min.js"></script>
+<script src="assets/data.js"></script>
+<script>
+(function(){
+"use strict";
+const D = window.SPRING;
+const G = D.geo, W = G.W, H = G.H;
+const nx = D.nx, ny = D.ny, N = nx * ny;
+const DAY_MIN = 1, DAY_MAX = 196;
+const TERMS = D.terms;               // 冬至 … 夏至
+const st = D.stations;
+const stById = new Map(st.map(s => [s.id, s]));
+const YEARS = D.years;               // station years 1957..2020
+const GRID_YEARS = D.gridKeys.filter(k => /^\d{4}$/.test(k)).map(Number);
+
+const state = { mode: 'compare', year: 2018, day: 95, station: '54511', playing: false };
+
+/* ---------- helpers ---------- */
+const $ = id => document.getElementById(id);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function md(doy, year){
+  const y = year || 2001;
+  const t = new Date(Date.UTC(y, 0, 1) + (doy - 1) * 864e5);
+  const pre = t.getUTCFullYear() < y ? '上年' : '';
+  return pre + (t.getUTCMonth() + 1) + '月' + t.getUTCDate() + '日';
+}
+function termsFor(year){ return year && D.jq[year] ? D.jq[year] : D.jqMean; }
+function termPhrase(doy, year){
+  const t = termsFor(year);
+  let k = -1;
+  for (let i = 0; i < t.length; i++) if (t[i] <= doy) k = i;
+  if (k < 0) return '冬至前';
+  const off = doy - t[k];
+  return off === 0 ? TERMS[k] : TERMS[k] + '后' + off + '天';
+}
+function hexToRgb(h){
+  h = h.replace('#', '');
+  if (h.length === 3) h = h.split('').map(c => c + c).join('');
+  const n = parseInt(h, 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+function parseColor(c){
+  if (c.startsWith('#')) return hexToRgb(c);
+  const m = c.match(/[\d.]+/g); return m ? m.slice(0, 3).map(Number) : [0, 0, 0];
+}
+
+/* ---------- decode grids ---------- */
+let near, inside, nearIdx, insideCount;
+const gridCache = new Map();
+let BIN;
+function decode(){
+  const s = atob(D.grid); const u = new Uint8Array(s.length);
+  for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i);
+  BIN = pako.inflate(u);
+  const nb = Math.ceil(N / 8);
+  near = new Uint8Array(N); inside = new Uint8Array(N);
+  for (let i = 0; i < N; i++){ near[i] = (BIN[i >> 3] >> (i & 7)) & 1; inside[i] = (BIN[nb + (i >> 3)] >> (i & 7)) & 1; }
+  nearIdx = []; insideCount = 0;
+  for (let i = 0; i < N; i++){ if (near[i]) nearIdx.push(i); if (inside[i]) insideCount++; }
+}
+function grid(key){
+  key = String(key);
+  if (gridCache.has(key)) return gridCache.get(key);
+  const off = D.gridOff[key], NC = D.NC;
+  const on = new Float32Array(N).fill(NaN), wd = new Uint8Array(N);
+  for (let j = 0; j < NC; j++){
+    const c = BIN[off + j], i = nearIdx[j];
+    on[i] = c === 0 ? NaN : c === 254 ? Infinity : c - 28;
+    wd[i] = (BIN[off + NC + (j >> 3)] >> (j & 7)) & 1;
+  }
+  // share-of-land curve
+  const vals = [];
+  for (let i = 0; i < N; i++) if (inside[i] && isFinite(on[i])) vals.push(on[i]);
+  vals.sort((a, b) => a - b);
+  const curve = new Float32Array(DAY_MAX + 1);
+  let p = 0;
+  for (let d = 0; d <= DAY_MAX; d++){ while (p < vals.length && vals[p] <= d) p++; curve[d] = p / insideCount; }
+  const g = { key, on, wd, curve, iso: null, hatch: null };
+  gridCache.set(key, g);
+  return g;
+}
+
+/* ---------- geometry ---------- */
+const gx0 = G.grid.x0, gy0 = G.grid.y0, gdx = G.grid.dx;
+const toPx = d3.geoTransform({ point(x, y){ this.stream.point(gx0 - gdx / 2 + x * gdx, gy0 - gdx / 2 + y * gdx); } });
+const gpath = d3.geoPath(toPx);
+const contours = d3.contours().size([nx, ny]).smooth(true);
+function regionLE(g, day){       // cells already in spring on `day`
+  const v = new Float64Array(N);
+  for (let i = 0; i < N; i++){ const o = g.on[i]; v[i] = (isFinite(o) && near[i]) ? -o : -1e4; }
+  return v;
+}
+function contourPath(values, thr){ return gpath(contours.contour(values, thr)) || ''; }
+function negVals(g){
+  if (!g._neg){ g._neg = regionLE(g, 0); }
+  return g._neg;
+}
+function isoLines(g, year){
+  const t = termsFor(year), out = [];
+  const v = negVals(g);
+  for (let i = 1; i < t.length; i++) out.push({ day: t[i], name: TERMS[i], d: contourPath(v, -t[i] - 0.5) });
+  return out;
+}
+function hatchPaths(g){
+  if (g.hatch) return g.hatch;
+  const a = new Float64Array(N), b = new Float64Array(N);
+  for (let i = 0; i < N; i++){ a[i] = g.wd[i] && near[i] ? 1 : 0; b[i] = g.on[i] === Infinity && near[i] ? 1 : 0; }
+  g.hatch = { wd: contourPath(a, 0.5), ns: contourPath(b, 0.5) };
+  return g.hatch;
+}
+
+/* ---------- static SVG ---------- */
+const svgNS = 'http://www.w3.org/2000/svg';
+const mapEl = $('map');
+mapEl.style.aspectRatio = W + ' / ' + H;
+const base = d3.select('#svgBase').attr('viewBox', `0 0 ${W} ${H}`);
+base.append('path').attr('d', G.world).attr('fill', 'none').attr('stroke', 'var(--world)').attr('stroke-width', 0.6);
+base.append('path').attr('d', G.china).attr('fill', 'var(--winter)');
+
+const ov = d3.select('#svgOv').attr('viewBox', `0 0 ${W} ${H}`);
+const defs = ov.append('defs');
+function hatch(id, color, angle, gap, width){
+  const p = defs.append('pattern').attr('id', id).attr('patternUnits', 'userSpaceOnUse').attr('width', gap).attr('height', gap).attr('patternTransform', `rotate(${angle})`);
+  p.append('line').attr('x1', 0).attr('y1', 0).attr('x2', 0).attr('y2', gap).attr('stroke', color).attr('stroke-width', width);
+}
+hatch('hWd', 'var(--ink)', 45, 5, 0.7);
+hatch('hNs', 'var(--muted)', -45, 4, 0.7);
+hatch('hGap', 'var(--accent)', 45, 4.5, 1.6);
+defs.append('clipPath').attr('id', 'clipChina').append('path').attr('d', G.china);
+const mask = defs.append('mask').attr('id', 'gapMask').attr('maskUnits', 'userSpaceOnUse').attr('x', 0).attr('y', 0).attr('width', W).attr('height', H);
+const maskIn = mask.append('path').attr('fill', 'white');
+const maskOut = mask.append('path').attr('fill', 'black');
+
+const L = {};
+L.clip = ov.append('g').attr('clip-path', 'url(#clipChina)');
+L.wd = L.clip.append('path').attr('fill', 'url(#hWd)').attr('opacity', 0.32);
+L.ns = L.clip.append('path').attr('fill', 'url(#hNs)').attr('opacity', 0.9);
+L.gap = L.clip.append('rect').attr('width', W).attr('height', H).attr('fill', 'url(#hGap)').attr('mask', 'url(#gapMask)').attr('opacity', 0.85);
+L.iso = L.clip.append('g').attr('fill', 'none').attr('stroke', 'var(--ink)').attr('stroke-opacity', 0.32).attr('stroke-width', 0.8);
+ov.append('path').attr('d', G.prov).attr('fill', 'none').attr('stroke', 'var(--prov)').attr('stroke-width', 0.7);
+ov.append('path').attr('d', G.nat).attr('fill', 'none').attr('stroke', 'var(--border)').attr('stroke-width', 1.1);
+L.clip2 = ov.append('g').attr('clip-path', 'url(#clipChina)');
+L.frontRefCase = L.clip2.append('path').attr('fill', 'none').attr('stroke', 'var(--halo)').attr('stroke-width', 3.6).attr('stroke-opacity', 0.85);
+L.frontCase = L.clip2.append('path').attr('fill', 'none').attr('stroke', 'var(--halo)').attr('stroke-width', 5).attr('stroke-opacity', 0.9).attr('stroke-linejoin', 'round');
+L.frontRef = L.clip2.append('path').attr('fill', 'none').attr('stroke', 'var(--e1)').attr('stroke-width', 1.8).attr('stroke-dasharray', '5 4');
+L.front = L.clip2.append('path').attr('fill', 'none').attr('stroke', 'var(--accent)').attr('stroke-width', 2.6).attr('stroke-linejoin', 'round');
+L.dots = ov.append('g');
+L.labels = ov.append('g').attr('font-size', 11).attr('font-family', 'var(--f-body)');
+L.sel = ov.append('circle').attr('r', 6).attr('fill', 'none').attr('stroke', 'var(--accent)').attr('stroke-width', 2);
+// South China Sea inset
+(function(){
+  const I = G.inset;
+  const g = ov.append('g').attr('aria-label', '南海诸岛');
+  g.append('rect').attr('x', I.x).attr('y', I.y).attr('width', I.w).attr('height', I.h).attr('fill', 'var(--panel)').attr('stroke', 'var(--ink2)').attr('stroke-width', 0.8);
+  g.append('path').attr('d', I.world).attr('fill', 'none').attr('stroke', 'var(--world)').attr('stroke-width', 0.5);
+  g.append('path').attr('d', I.china).attr('fill', 'var(--land)').attr('stroke', 'none');
+  g.append('path').attr('d', I.nat).attr('fill', 'none').attr('stroke', 'var(--border)').attr('stroke-width', 0.9);
+  g.append('text').attr('x', I.x + I.w - 6).attr('y', I.y + I.h - 6).attr('text-anchor', 'end').attr('font-size', 10).attr('fill', 'var(--ink2)').text('南海诸岛');
+})();
+
+// city labels
+const CITY = [['54511','北京',1],['58367','上海',1],['59287','广州',1],['57494','武汉',1],['56294','成都',-1],['57036','西安',1],['50953','哈尔滨',1],
+  ['51463','乌鲁木齐',1],['55591','拉萨',1],['56778','昆明',-1],['52866','西宁',-1],['54342','沈阳',1],['57083','郑州',1],['58238','南京',-1],
+  ['58847','福州',1],['59431','南宁',-1],['53463','呼和浩特',-1],['57816','贵阳',1],['52889','兰州',1],['57687','长沙',-1],['54161','长春',1],['53614','银川',-1]];
+CITY.forEach(([id, name, side]) => {
+  const s = stById.get(id); if (!s) return;
+  L.labels.append('circle').attr('cx', s.x).attr('cy', s.y).attr('r', 2.2).attr('fill', 'var(--ink)');
+  L.labels.append('text').attr('x', s.x + side * 4.5).attr('y', s.y + 3.8).attr('text-anchor', side > 0 ? 'start' : 'end')
+    .attr('fill', 'var(--ink)').attr('stroke', 'var(--halo)').attr('stroke-width', 2.6).attr('paint-order', 'stroke').attr('stroke-linejoin', 'round').text(name);
+});
+
+/* ---------- canvas raster ---------- */
+const cv = $('cv'), ctx = cv.getContext('2d');
+const off = document.createElement('canvas'); off.width = nx; off.height = ny;
+const octx = off.getContext('2d');
+const img = octx.createImageData(nx, ny);
+let chinaPath2D = new Path2D(G.china);
+let PAL = {};
+function readPalette(){
+  const ramp = ['--s0','--s1','--s2','--s3','--s4','--s5'].map(v => parseColor(css(v)));
+  const stops = [0, 8, 18, 32, 50, 75];
+  PAL.spring = new Array(91);
+  for (let a = 0; a <= 90; a++){
+    let k = 0; while (k < stops.length - 2 && a > stops[k + 1]) k++;
+    const t = Math.min(1, Math.max(0, (a - stops[k]) / (stops[k + 1] - stops[k])));
+    PAL.spring[a] = ramp[k].map((c, i) => Math.round(c + (ramp[k + 1][i] - c) * t));
+  }
+  PAL.winter = parseColor(css('--winter'));
+  PAL.nospring = parseColor(css('--nospring'));
+  const dv = ['--dv-e3','--dv-e2','--dv-e1','--dv-0','--dv-l1','--dv-l2'].map(v => parseColor(css(v)));
+  PAL.div = d => {   // d = e2 - e1 days; negative = earlier
+    const pts = [[-25, dv[0]], [-14, dv[1]], [-5, dv[2]], [0, dv[3]], [7, dv[4]], [16, dv[5]]];
+    if (d <= pts[0][0]) return pts[0][1];
+    if (d >= pts[5][0]) return pts[5][1];
+    for (let i = 0; i < 5; i++) if (d <= pts[i + 1][0]){
+      const t = (d - pts[i][0]) / (pts[i + 1][0] - pts[i][0]);
+      return pts[i][1].map((c, j) => Math.round(c + (pts[i + 1][1][j] - c) * t));
+    }
+  };
+  PAL.wdBoth = parseColor(css('--dv-0'));
+  PAL.became = parseColor(css('--dv-e3'));
+}
+function sizeCanvas(){
+  const r = mapEl.getBoundingClientRect();
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.max(1, Math.round(r.width * dpr)); cv.height = Math.max(1, Math.round(r.height * dpr));
+}
+function drawRaster(){
+  const px = img.data;
+  const day = state.day;
+  const P = primary(), R2 = reference();
+  for (let i = 0; i < N; i++){
+    const k = i * 4;
+    if (!near[i]){ px[k + 3] = 0; continue; }
+    let c = null;
+    if (state.mode === 'diff'){
+      const a = R2.on[i], b = P.on[i];
+      if (a === Infinity || b === Infinity) c = PAL.nospring;
+      else if (isNaN(a) || isNaN(b)) c = null;
+      else if (R2.wd[i] && P.wd[i]) c = PAL.wdBoth;
+      else if (P.wd[i] && !R2.wd[i]) c = PAL.became;
+      else c = PAL.div(b - a);
+    } else {
+      const o = P.on[i];
+      if (isNaN(o)) c = null;
+      else if (o === Infinity) c = PAL.nospring;
+      else if (o <= day) c = PAL.spring[Math.min(90, Math.max(0, Math.round(day - o)))];
+      else c = PAL.winter;
+    }
+    if (!c){ px[k + 3] = 0; continue; }
+    px[k] = c[0]; px[k + 1] = c[1]; px[k + 2] = c[2]; px[k + 3] = 255;
+  }
+  octx.putImageData(img, 0, 0);
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, cv.width, cv.height);
+  const s = cv.width / W;
+  ctx.setTransform(s, 0, 0, s, 0, 0);
+  ctx.save(); ctx.clip(chinaPath2D);
+  ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(off, gx0 - gdx / 2, gy0 - gdx / 2, nx * gdx, ny * gdx);
+  ctx.restore();
+}
+
+/* ---------- datasets by mode ---------- */
+function primary(){
+  if (state.mode === 'compare' || state.mode === 'diff') return grid('e2');
+  if (state.mode === 'year') return grid(state.year);
+  return grid('n9120');
+}
+function reference(){
+  if (state.mode === 'compare' || state.mode === 'diff') return grid('e1');
+  if (state.mode === 'year') return grid('n9120');
+  return null;
+}
+function termYear(){ return state.mode === 'year' ? state.year : null; }
+function label(which){
+  if (state.mode === 'compare' || state.mode === 'diff') return which === 'p' ? '2010年代' : '1960年前后';
+  if (state.mode === 'year') return which === 'p' ? state.year + '年' : '常年';
+  return '常年（1991–2020）';
+}
+function stationVal(s, which){   // returns [doy, flag] or null
+  let v;
+  if (state.mode === 'compare' || state.mode === 'diff') v = s.c[which === 'p' ? 'e2' : 'e1'];
+  else if (state.mode === 'year'){
+    if (which === 'p'){ const k = YEARS.indexOf(state.year); const f = +s.f[k]; v = f === 3 ? null : [s.o[k], f]; }
+    else v = s.c.n9120;
+  } else v = which === 'p' ? s.c.n9120 : null;
+  if (!v || v[1] === 3) return null;
+  return v;
+}
+
+/* ---------- overlay render ---------- */
+let isoCache = new Map();
+function drawOverlay(){
+  const P = primary(), R2 = reference();
+  const day = state.day, diff = state.mode === 'diff';
+  const h = hatchPaths(P);
+  L.wd.attr('d', diff ? '' : h.wd);
+  L.ns.attr('d', h.ns);
+  // 节气 isolines up to today
+  const ik = P.key + '|' + (termYear() || 'm');
+  if (!isoCache.has(ik)) isoCache.set(ik, isoLines(P, termYear()));
+  const iso = diff ? [] : isoCache.get(ik).filter(t => t.day <= day && t.day >= 20);
+  L.iso.selectAll('path').data(iso, d => d.name).join('path').attr('d', d => d.d);
+  if (diff){
+    L.front.attr('d', ''); L.frontRef.attr('d', ''); L.frontCase.attr('d', ''); L.frontRefCase.attr('d', ''); L.gap.attr('display', 'none');
+  } else {
+    const fp = contourPath(negVals(P), -day - 0.5);
+    L.front.attr('d', fp); L.frontCase.attr('d', fp);
+    if (R2){
+      const fr = contourPath(negVals(R2), -day - 0.5);
+      L.frontRef.attr('d', fr); L.frontRefCase.attr('d', fr);
+      if (state.mode === 'compare'){ maskIn.attr('d', fp); maskOut.attr('d', fr); L.gap.attr('display', null); }
+      else L.gap.attr('display', 'none');
+    } else { L.frontRef.attr('d', ''); L.frontRefCase.attr('d', ''); L.gap.attr('display', 'none'); }
+  }
+  // station dots
+  const shown = st.filter(s => (state.mode === 'compare' || state.mode === 'diff') ? s.era : stationVal(s, 'p'));
+  L.dots.selectAll('circle').data(shown, d => d.id).join('circle')
+    .attr('cx', d => d.x).attr('cy', d => d.y).attr('r', 1.5)
+    .attr('fill', d => {
+      if (!diff) return 'var(--panel)';
+      const a = d.c.e1, b = d.c.e2;
+      if (a[1] !== 0 || b[1] !== 0) return 'var(--panel)';
+      const c = PAL.div(b[0] - a[0]); return `rgb(${c})`;
+    })
+    .attr('stroke', 'var(--ink)').attr('stroke-opacity', 0.55).attr('stroke-width', 0.6);
+  const sel = stById.get(state.station);
+  if (sel) L.sel.attr('cx', sel.x).attr('cy', sel.y).attr('display', null); else L.sel.attr('display', 'none');
+}
+
+/* ---------- legend ---------- */
+function rampCss(){
+  return `linear-gradient(90deg, ${['--s0','--s1','--s2','--s3','--s4','--s5'].map(v => `var(${v})`).join(',')})`;
+}
+function drawLegend(){
+  const el = $('legend');
+  if (state.mode === 'diff'){
+    el.innerHTML = `<span class="k"><span class="ramp" style="background:linear-gradient(90deg,var(--dv-e3),var(--dv-e2),var(--dv-e1),var(--dv-0),var(--dv-l1),var(--dv-l2))"></span>提前 25 天 ← 0 → 推迟 15 天</span>
+      <span class="k"><span class="sw" style="background:var(--dv-e3)"></span>1960年前后有冬，2010年代无冬</span>
+      <span class="k"><span class="sw" style="background:var(--dv-0)"></span>两代都无冬</span>
+      <span class="k"><span class="sw" style="background:repeating-linear-gradient(-45deg,var(--muted) 0 1px,var(--nospring) 1px 4px)"></span>无春</span>`;
+    return;
+  }
+  const ref = reference();
+  el.innerHTML = `<span class="k"><span class="ramp" style="background:${rampCss()}"></span>已入春：颜色越深，春天来得越久</span>
+    <span class="k"><span class="sw" style="background:var(--winter)"></span>尚未入春</span>
+    <span class="k"><span class="ln"></span>${label('p')}今天的春线</span>
+    ${ref ? `<span class="k"><span class="ln dash"></span>${label('r')}同日春线</span>` : ''}
+    ${state.mode === 'compare' ? `<span class="k"><span class="sw" style="background:repeating-linear-gradient(45deg,var(--accent) 0 1.5px,transparent 1.5px 4.5px)"></span>六十年前此时还没入春</span>` : ''}
+    <span class="k"><span class="ln thin"></span>已过各节气那天的春线</span>
+    <span class="k"><span class="sw" style="background:repeating-linear-gradient(45deg,var(--ink2) 0 1px,transparent 1px 5px)"></span>无冬</span>
+    <span class="k"><span class="sw" style="background:repeating-linear-gradient(-45deg,var(--muted) 0 1px,var(--nospring) 1px 4px)"></span>无春</span>`;
+}
+
+/* ---------- calendar ---------- */
+function drawTicks(){
+  const t = termsFor(termYear()), el = $('ticks');
+  const major = new Set(['立春','惊蛰','春分','清明','谷雨','立夏','芒种','夏至']);
+  el.innerHTML = '';
+  TERMS.forEach((n, i) => {
+    const d = t[i]; if (d < DAY_MIN || d > DAY_MAX) return;
+    const sp = document.createElement('span');
+    sp.textContent = n; sp.className = major.has(n) ? '' : 'minor';
+    sp.style.left = ((d - DAY_MIN) / (DAY_MAX - DAY_MIN) * 100) + '%';
+    el.appendChild(sp);
+  });
+}
+function drawReadout(){
+  const y = termYear();
+  if (state.mode === 'diff'){
+    $('rdDate').textContent = '提前了多少天';
+    $('rdTerm').textContent = '2010年代 对比 1960年前后';
+    $('rdNote').textContent = '按两个时期的平均气温曲线计算';
+    return;
+  }
+  $('rdDate').textContent = md(state.day, y || 2001);
+  $('rdTerm').textContent = termPhrase(state.day, y);
+  const P = primary(), R2 = reference();
+  const a = Math.round(P.curve[state.day] * 100);
+  $('rdNote').textContent = R2 ? `已入春国土：${label('p')} ${a}% · ${label('r')} ${Math.round(R2.curve[state.day] * 100)}%` : `已入春国土 ${a}%`;
+}
+
+/* ---------- share curve ---------- */
+function drawCurve(){
+  const box = $('curveBox');
+  if (state.mode === 'diff'){ box.hidden = true; return; }
+  box.hidden = false;
+  const svg = d3.select('#curve'); svg.selectAll('*').remove();
+  const w = 760, h = 150, m = { l: 34, r: 10, t: 10, b: 22 };
+  const x = d3.scaleLinear([DAY_MIN, DAY_MAX], [m.l, w - m.r]);
+  const y = d3.scaleLinear([0, 1], [h - m.b, m.t]);
+  const t = termsFor(termYear());
+  t.forEach((d, i) => { if (d < DAY_MIN || d > DAY_MAX) return;
+    svg.append('line').attr('x1', x(d)).attr('x2', x(d)).attr('y1', m.t).attr('y2', h - m.b).attr('stroke', 'var(--rule)').attr('stroke-width', 1); });
+  [0, .25, .5, .75, 1].forEach(v => {
+    svg.append('line').attr('x1', m.l).attr('x2', w - m.r).attr('y1', y(v)).attr('y2', y(v)).attr('stroke', v === 0 ? 'var(--muted)' : 'var(--rule)').attr('stroke-width', v === 0 ? 1 : 0.6);
+    svg.append('text').attr('x', m.l - 6).attr('y', y(v) + 4).attr('text-anchor', 'end').attr('font-size', 11).attr('fill', 'var(--muted)').attr('style', 'font-variant-numeric:tabular-nums').text(Math.round(v * 100) + '%');
+  });
+  [['1月',1],['2月',32],['3月',60],['4月',91],['5月',121],['6月',152],['7月',182]].forEach(([n, d]) =>
+    svg.append('text').attr('x', x(d)).attr('y', h - 6).attr('font-size', 11).attr('fill', 'var(--muted)').text(n));
+  const P = primary(), R2 = reference();
+  const pts = c => { const a = []; for (let d = DAY_MIN; d <= DAY_MAX; d++) a.push([x(d), y(c[d])]); return 'M' + a.map(p => p.join(',')).join('L'); };
+  if (R2) svg.append('path').attr('d', pts(R2.curve)).attr('fill', 'none').attr('stroke', 'var(--e1)').attr('stroke-width', 2).attr('stroke-dasharray', '5 4');
+  svg.append('path').attr('d', pts(P.curve)).attr('fill', 'none').attr('stroke', 'var(--s4)').attr('stroke-width', 2.2);
+  const cur = svg.append('g').attr('class', 'cur');
+  cur.append('line').attr('y1', m.t).attr('y2', h - m.b).attr('stroke', 'var(--accent)').attr('stroke-width', 1.2);
+  if (R2) cur.append('circle').attr('class', 'cr').attr('r', 4).attr('fill', 'var(--panel)').attr('stroke', 'var(--e1)').attr('stroke-width', 2);
+  cur.append('circle').attr('class', 'cp').attr('r', 4.5).attr('fill', 'var(--s4)').attr('stroke', 'var(--panel)').attr('stroke-width', 2);
+  // hover/scrub on the curve sets the day
+  svg.append('rect').attr('x', m.l).attr('y', 0).attr('width', w - m.l - m.r).attr('height', h).attr('fill', 'transparent').style('cursor', 'ew-resize')
+    .on('pointerdown pointermove', ev => { if (ev.type === 'pointermove' && ev.buttons !== 1) return;
+      const [mx] = d3.pointer(ev); setDay(Math.round(x.invert(mx)), true); });
+  drawCurveCursor._x = x; drawCurveCursor._y = y;
+  $('curveTitle').textContent = '已入春的国土比例';
+  $('curveCap').textContent = R2 ? `实线：${label('p')}；虚线：${label('r')}。曲线越靠左，春天来得越早。按住拖动可以换日期。` : '按住拖动可以换日期。';
+  drawCurveCursor();
+}
+function drawCurveCursor(){
+  const x = drawCurveCursor._x, y = drawCurveCursor._y; if (!x || state.mode === 'diff') return;
+  const P = primary(), R2 = reference(), d = state.day;
+  const g = d3.select('#curve .cur');
+  g.select('line').attr('x1', x(d)).attr('x2', x(d));
+  g.select('.cp').attr('cx', x(d)).attr('cy', y(P.curve[d]));
+  if (R2) g.select('.cr').attr('cx', x(d)).attr('cy', y(R2.curve[d]));
+}
+
+/* ---------- station card ---------- */
+function fmtVal(v, year){
+  if (!v) return { t: '—', s: '无资料' };
+  if (v[1] === 2) return { t: '无春', s: '到8月底仍未入春' };
+  if (v[1] === 1) return { t: '无冬', s: '冬季缺失' };
+  return { t: md(v[0], year), s: termPhrase(v[0], year) };
+}
+function drawStation(){
+  const s = stById.get(state.station); if (!s) return;
+  const e1 = s.c.e1, e2 = s.c.e2, n = s.c.n9120;
+  const a = fmtVal(e1[1] !== 3 ? e1 : null), b = fmtVal(e2[1] !== 3 ? e2 : null), c = fmtVal(n[1] !== 3 ? n : null);
+  let delta = '';
+  if (e1[1] === 0 && e2[1] === 0){
+    const d = e2[0] - e1[0];
+    delta = d < 0 ? `2010年代比1960年前后 <b>提前 ${-d} 天</b>` : d > 0 ? `2010年代比1960年前后 <b>推迟 ${d} 天</b>` : '两个时期入春日相同';
+  } else if (e1[1] === 0 && e2[1] === 1) delta = '1960年前后有冬季，<b>2010年代已无冬</b>';
+  else if (e1[1] === 1 && e2[1] === 1) delta = '两个时期都没有气象意义上的冬季';
+  else delta = '两个时期的资料不全，无法比较';
+  // trend 1974–2020
+  const xs = [], ys = [];
+  YEARS.forEach((y, k) => { if (y >= 1974 && s.f[k] === '0') { xs.push(y); ys.push(s.o[k]); } });
+  let trend = '';
+  if (xs.length >= 25){
+    const mx = d3.mean(xs), my = d3.mean(ys);
+    const b1 = d3.sum(xs.map((x, i) => (x - mx) * (ys[i] - my))) / d3.sum(xs.map(x => (x - mx) ** 2));
+    const per = b1 * 10;
+    trend = Math.abs(per) < 0.5 ? '1974–2020 年间几乎没有趋势。' : `1974–2020 年，平均每 10 年${per < 0 ? '提前' : '推迟'} ${Math.abs(per).toFixed(1)} 天（${xs.length} 年有效）。`;
+  }
+  $('stcard').innerHTML = `<div class="stname">${s.n}</div>
+    <div class="stmeta">${s.p || ''} · 区站号 ${s.id} · 海拔 ${s.z} 米</div>
+    <div class="cmp">
+      <div><small>1960年前后</small><b>${a.t}</b><i>${a.s}</i></div>
+      <div><small>2010年代</small><b>${b.t}</b><i>${b.s}</i></div>
+      <div><small>常年（1991–2020）</small><b>${c.t}</b><i>${c.s}</i></div>
+      ${state.mode === 'year' ? (() => { const k = YEARS.indexOf(state.year); const f = +s.f[k]; const v = fmtVal(f === 3 ? null : [s.o[k], f], state.year); return `<div><small>${state.year}年</small><b>${v.t}</b><i>${v.s}</i></div>`; })() : ''}
+    </div>
+    <div class="delta">${delta}</div>`;
+  $('stcap').textContent = trend + ' 圆点为逐年入春日，空心圈是无冬年份（取最冷时段）；横线为两个时期的常年值。';
+  drawStationChart(s);
+  $('q').value = '';
+  d3.selectAll('#tbl tbody tr').attr('aria-selected', function(){ return this.dataset.id === s.id || this.dataset.id2 === s.id ? 'true' : 'false'; });
+}
+function drawStationChart(s){
+  const svg = d3.select('#stchart'); svg.selectAll('*').remove();
+  const w = 300, h = 210, m = { l: 40, r: 16, t: 10, b: 22 };
+  const vals = [];
+  YEARS.forEach((y, k) => { if (s.f[k] === '0' || s.f[k] === '1') vals.push(s.o[k]); });
+  [s.c.e1, s.c.e2].forEach(v => { if (v[1] <= 1) vals.push(v[0]); });
+  if (!vals.length){ svg.append('text').attr('x', w / 2).attr('y', h / 2).attr('text-anchor', 'middle').attr('fill', 'var(--muted)').attr('font-size', 12).text('该站没有可用的入春日'); return; }
+  let lo = d3.min(vals) - 6, hi = d3.max(vals) + 6;
+  if (hi - lo < 40){ const c = (hi + lo) / 2; lo = c - 20; hi = c + 20; }
+  const x = d3.scaleLinear([1956, 2021], [m.l, w - m.r]);
+  const y = d3.scaleLinear([lo, hi], [h - m.b, m.t]);
+  // gap band
+  svg.append('rect').attr('x', x(1964.5)).attr('width', x(1973.5) - x(1964.5)).attr('y', m.t).attr('height', h - m.b - m.t).attr('fill', 'var(--rule)').attr('opacity', 0.5);
+  svg.append('text').attr('x', (x(1964.5) + x(1973.5)) / 2).attr('y', m.t + 12).attr('text-anchor', 'middle').attr('font-size', 10).attr('fill', 'var(--muted)').text('缺测');
+  // solar-term gridlines as y labels
+  const t = D.jqMean;
+  TERMS.forEach((n, i) => { const d = t[i]; if (d < lo || d > hi) return;
+    svg.append('line').attr('x1', m.l).attr('x2', w - m.r).attr('y1', y(d)).attr('y2', y(d)).attr('stroke', 'var(--rule)').attr('stroke-width', 0.8);
+    svg.append('text').attr('x', m.l - 5).attr('y', y(d) + 3.5).attr('text-anchor', 'end').attr('font-size', 10.5).attr('fill', 'var(--ink2)').text(n); });
+  [1960, 1980, 2000, 2020].forEach(yy => svg.append('text').attr('x', x(yy)).attr('y', h - 6).attr('text-anchor', 'middle').attr('font-size', 10.5).attr('fill', 'var(--muted)').text(yy));
+  svg.append('line').attr('x1', m.l).attr('x2', w - m.r).attr('y1', h - m.b).attr('y2', h - m.b).attr('stroke', 'var(--muted)').attr('stroke-width', 0.8);
+  // era lines
+  if (s.c.e1[1] === 0) svg.append('line').attr('x1', x(1956.6)).attr('x2', x(1964.4)).attr('y1', y(s.c.e1[0])).attr('y2', y(s.c.e1[0])).attr('stroke', 'var(--e1)').attr('stroke-width', 2.5).attr('stroke-dasharray', '4 3');
+  if (s.c.e2[1] === 0) svg.append('line').attr('x1', x(2010.6)).attr('x2', x(2020.4)).attr('y1', y(s.c.e2[0])).attr('y2', y(s.c.e2[0])).attr('stroke', 'var(--accent)').attr('stroke-width', 2.5);
+  const pts = [];
+  YEARS.forEach((yy, k) => { const f = s.f[k]; if (f === '0' || f === '1') pts.push({ y: yy, d: s.o[k], wd: f === '1' }); });
+  const tip = $('tip');
+  svg.selectAll('circle.p').data(pts).join('circle').attr('class', 'p')
+    .attr('cx', d => x(d.y)).attr('cy', d => y(d.d)).attr('r', d => d.y === state.year && state.mode === 'year' ? 4.6 : 3)
+    .attr('fill', d => d.wd ? 'var(--panel)' : 'var(--s4)').attr('stroke', d => d.wd ? 'var(--muted)' : (d.y === state.year && state.mode === 'year' ? 'var(--accent)' : 'var(--panel)'))
+    .attr('stroke-width', d => d.wd ? 1.2 : 1.2)
+    .append('title').text(d => `${d.y}年：${d.wd ? '无冬（最冷时段 ' + md(d.d, d.y) + '）' : md(d.d, d.y) + ' · ' + termPhrase(d.d, d.y)}`);
+}
+
+/* ---------- table ---------- */
+const CAPS = [['北京',['54511']],['天津',['54527']],['石家庄',['53698']],['太原',['53772']],['呼和浩特',['53463']],['沈阳',['54342']],['长春',['54161']],['哈尔滨',['50953']],
+  ['上海',['58367']],['南京',['58238']],['杭州',['58457']],['合肥',['58321']],['福州',['58847']],['南昌',['58606']],['济南',['54823']],['郑州',['57083']],['武汉',['57494']],
+  ['长沙',['57679','57687']],['广州',['59287']],['南宁',['59431']],['海口',['59758']],['重庆',['57515','57516']],['成都',['56294']],['贵阳',['57816']],['昆明',['56778']],
+  ['拉萨',['55591']],['西安',['57036']],['兰州',['52889']],['西宁',['52866']],['银川',['53614']],['乌鲁木齐',['51463']],['香港',['45005']],['澳门',['45011']],['台北',['46696','58968']]];
+let tblSort = { k: 'd', dir: 1 };
+function capRows(){
+  return CAPS.map(([city, ids]) => {
+    const a = stById.get(ids[0]), b = stById.get(ids[ids.length - 1]);
+    if (!a && !b) return null;
+    const e1 = a && a.c.e1[1] !== 3 ? a.c.e1 : null, e2 = b && b.c.e2[1] !== 3 ? b.c.e2 : null;
+    const nn = (b && b.c.n9120[1] !== 3) ? b.c.n9120 : (a && a.c.n9120[1] !== 3 ? a.c.n9120 : null);
+    const d = e1 && e2 && e1[1] === 0 && e2[1] === 0 ? e2[0] - e1[0] : null;
+    return { city, id: (b || a).id, id2: (a || b).id, e1, e2, n: nn, d, lat: (b || a).lat, two: ids.length > 1 };
+  }).filter(Boolean);
+}
+function drawTable(){
+  const rows = capRows();
+  const key = r => tblSort.k === 'city' ? -r.lat : tblSort.k === 'd' ? (r.d == null ? 999 : r.d) : (r[tblSort.k] && r[tblSort.k][1] === 0 ? r[tblSort.k][0] : (r[tblSort.k] ? -99 : 999));
+  rows.sort((p, q) => (key(p) - key(q)) * tblSort.dir);
+  const cell = v => !v ? '—' : v[1] === 1 ? '无冬' : v[1] === 2 ? '无春' : `${md(v[0])}<span class="cap"> ${termPhrase(v[0])}</span>`;
+  const tb = d3.select('#tbl tbody');
+  tb.selectAll('tr').data(rows, r => r.city).join('tr')
+    .attr('tabindex', 0).attr('data-id', r => r.id).attr('data-id2', r => r.id2)
+    .html(r => {
+      let dd = '—';
+      if (r.d != null){ const wpx = Math.min(80, Math.abs(r.d) * 3.2);
+        dd = `<span class="bar-d" style="width:${wpx}px;background:${r.d < 0 ? 'var(--accent)' : 'var(--dv-l2)'}"></span>${r.d < 0 ? '提前 ' + (-r.d) : r.d > 0 ? '推迟 ' + r.d : '持平'}${r.d ? ' 天' : ''}`; }
+      else if (r.e1 && r.e2 && r.e1[1] === 0 && r.e2[1] === 1) dd = '变为无冬';
+      return `<td>${r.city}${r.two ? '<sup>*</sup>' : ''}</td><td class="n">${cell(r.e1)}</td><td class="n">${cell(r.e2)}</td><td class="n">${dd}</td><td class="n">${cell(r.n)}</td>`;
+    })
+    .on('click', (ev, r) => selectStation(r.id))
+    .on('keydown', (ev, r) => { if (ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); selectStation(r.id); } });
+  d3.selectAll('#tbl th').attr('aria-sort', function(){ return this.dataset.k === tblSort.k ? (tblSort.dir > 0 ? 'ascending' : 'descending') : null; });
+  const vs = rows.filter(r => r.d != null).map(r => r.d);
+  $('tblcap').innerHTML = `${vs.length} 个城市两个时期都有完整资料，其中 ${vs.filter(v => v < 0).length} 个提前，中位数提前 ${-d3.median(vs)} 天。<sup>*</sup> 两个时期用的是同一城市前后两个站号（迁站或改号）。“—”表示该时期 GSOD 里没有足够资料。`;
+}
+d3.selectAll('#tbl th').on('click', function(){
+  const k = this.dataset.k; tblSort = { k, dir: tblSort.k === k ? -tblSort.dir : 1 }; drawTable(); drawStationSelectRows();
+});
+function drawStationSelectRows(){ const s = stById.get(state.station); if (s) d3.selectAll('#tbl tbody tr').attr('aria-selected', function(){ return this.dataset.id === s.id || this.dataset.id2 === s.id ? 'true' : 'false'; }); }
+
+/* ---------- headline ---------- */
+function drawHeadline(){
+  const d = st.filter(s => s.era && s.c.e1[1] === 0 && s.c.e2[1] === 0).map(s => s.c.e2[0] - s.c.e1[0]);
+  const med = -d3.median(d), share = Math.round(d.filter(v => v < 0).length / d.length * 100);
+  const e1 = grid('e1'), e2 = grid('e2'), q = D.jqMean[TERMS.indexOf('清明')];
+  $('headline').innerHTML = `<div class="hstat"><b>${med}<small>天</small></b><span>2010年代比1960年前后，入春日中位数提前（${d.length} 站）</span></div>
+    <div class="hstat"><b>${share}<small>%</small></b><span>的站点入春提前了</span></div>
+    <div class="hstat"><b>${Math.round(e1.curve[q] * 100)}→${Math.round(e2.curve[q] * 100)}<small>%</small></b><span>清明这天已入春的国土比例</span></div>`;
+}
+
+/* ---------- tooltip / picking ---------- */
+const tip = $('tip');
+function viewPt(ev){
+  const r = mapEl.getBoundingClientRect();
+  return { vx: (ev.clientX - r.left) / r.width * W, vy: (ev.clientY - r.top) / r.height * H, cx: ev.clientX - r.left, cy: ev.clientY - r.top, rw: r.width };
+}
+function nearestStation(vx, vy, maxd){
+  let best = null, bd = maxd * maxd;
+  const pool = st.filter(s => (state.mode === 'compare' || state.mode === 'diff') ? s.era : stationVal(s, 'p'));
+  for (const s of pool){ const d = (s.x - vx) ** 2 + (s.y - vy) ** 2; if (d < bd){ bd = d; best = s; } }
+  return best;
+}
+function cellAt(vx, vy){
+  const j = Math.round((vx - gx0) / gdx), i = Math.round((vy - gy0) / gdx);
+  if (i < 0 || j < 0 || i >= ny || j >= nx) return -1;
+  const k = i * nx + j; return inside[k] ? k : -1;
+}
+function cellText(g, k, year){
+  const o = g.on[k];
+  if (isNaN(o)) return '无资料';
+  if (o === Infinity) return '无春';
+  if (g.wd[k]) return '无冬';
+  return md(o, year || 2001) + ' · ' + termPhrase(o, year);
+}
+function showTip(ev){
+  const p = viewPt(ev); const k = cellAt(p.vx, p.vy);
+  if (k < 0){ tip.hidden = true; return; }
+  const P = primary(), R2 = reference();
+  let html = '';
+  if (state.mode === 'diff'){
+    const a = R2.on[k], b = P.on[k];
+    let t = '';
+    if (isFinite(a) && isFinite(b) && !R2.wd[k] && !P.wd[k]){ const d = Math.round(b - a); t = d < 0 ? `提前 ${-d} 天` : d > 0 ? `推迟 ${d} 天` : '持平'; }
+    html = `<b>${t || '—'}</b><br>1960年前后：${cellText(R2, k)}<br>2010年代：${cellText(P, k)}`;
+  } else {
+    html = `<b>${label('p')}：${cellText(P, k, termYear())}</b>` + (R2 ? `<br>${label('r')}：${cellText(R2, k)}` : '');
+  }
+  const s = nearestStation(p.vx, p.vy, 24);
+  if (s){ const v = stationVal(s, 'p'); html += `<br><span class="m">最近的站：${s.n}${v && v[1] === 0 ? '（' + md(v[0], termYear() || 2001) + '）' : ''}，点击查看</span>`; }
+  else html += `<br><span class="m">插值结果</span>`;
+  tip.innerHTML = html; tip.hidden = false;
+  const tw = tip.offsetWidth, th = tip.offsetHeight;
+  let lx = p.cx + 14, ly = p.cy + 14;
+  if (lx + tw > p.rw - 4) lx = p.cx - tw - 14;
+  if (ly + th > mapEl.clientHeight) ly = p.cy - th - 14;
+  tip.style.left = Math.max(0, lx) + 'px'; tip.style.top = Math.max(0, ly) + 'px';
+}
+const ovEl = $('svgOv');
+ovEl.addEventListener('pointermove', showTip);
+ovEl.addEventListener('pointerleave', () => { tip.hidden = true; });
+ovEl.addEventListener('click', ev => {
+  const p = viewPt(ev); const s = nearestStation(p.vx, p.vy, 30);
+  if (s) selectStation(s.id);
+  showTip(ev);
+});
+
+/* ---------- state updates ---------- */
+function selectStation(id){
+  if (!stById.has(id)) return;
+  state.station = id; drawStation();
+  const s = stById.get(id); L.sel.attr('cx', s.x).attr('cy', s.y).attr('display', null);
+}
+function setDay(d, fromUser){
+  d = Math.max(DAY_MIN, Math.min(DAY_MAX, d));
+  if (fromUser && state.playing) togglePlay(false);
+  if (d === state.day && !fromUser) return;
+  state.day = d; $('day').value = d;
+  drawRaster(); drawOverlay(); drawReadout(); drawCurveCursor();
+}
+function setMode(m){
+  state.mode = m;
+  document.querySelectorAll('.seg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === m)));
+  $('yearbox').hidden = m !== 'year';
+  $('cal').hidden = m === 'diff';
+  if (m === 'diff' && state.playing) togglePlay(false);
+  renderAll();
+}
+function setYear(y){ state.year = y; $('ysel').value = y; renderAll(); }
+function renderAll(){
+  drawTicks(); drawLegend(); drawRaster(); drawOverlay(); drawReadout(); drawCurve(); drawStation();
+}
+document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
+$('day').addEventListener('input', e => setDay(+e.target.value, true));
+const ysel = $('ysel');
+GRID_YEARS.slice().reverse().forEach(y => { const o = document.createElement('option'); o.value = y; o.textContent = y + '年'; ysel.appendChild(o); });
+ysel.addEventListener('change', () => setYear(+ysel.value));
+$('yprev').addEventListener('click', () => { const i = GRID_YEARS.indexOf(state.year); if (i > 0) setYear(GRID_YEARS[i - 1]); });
+$('ynext').addEventListener('click', () => { const i = GRID_YEARS.indexOf(state.year); if (i < GRID_YEARS.length - 1) setYear(GRID_YEARS[i + 1]); });
+
+let raf = null, lastT = 0, acc = 0;
+function togglePlay(on){
+  state.playing = on === undefined ? !state.playing : on;
+  $('play').setAttribute('aria-label', state.playing ? '暂停' : '播放');
+  $('playIcon').innerHTML = state.playing ? '<path d="M3.5 2.5h3v11h-3zM9.5 2.5h3v11h-3z"/>' : '<path d="M4 2.5v11l9-5.5z"/>';
+  if (state.playing){
+    if (state.day >= DAY_MAX) setDay(DAY_MIN);
+    lastT = performance.now(); acc = 0;
+    const step = t => {
+      if (!state.playing) return;
+      acc += (t - lastT) / 1000 * 14; lastT = t;     // ~14 days per second
+      if (acc >= 1){ const n = Math.floor(acc); acc -= n; setDay(state.day + n); }
+      if (state.day >= DAY_MAX){ togglePlay(false); return; }
+      raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+  } else if (raf) cancelAnimationFrame(raf);
+}
+$('play').addEventListener('click', () => togglePlay());
+
+// station search
+const dl = $('stlist');
+const nameCount = {};
+st.forEach(s => { nameCount[s.n] = (nameCount[s.n] || 0) + 1; });
+const nameMap = new Map();
+st.forEach(s => { const k = nameCount[s.n] > 1 ? `${s.n}（${s.p || s.id}）` : s.n; nameMap.set(k, s.id); const o = document.createElement('option'); o.value = k; dl.appendChild(o); });
+$('q').addEventListener('change', e => { const id = nameMap.get(e.target.value.trim()) || [...nameMap.entries()].find(([k]) => k.startsWith(e.target.value.trim()))?.[1]; if (id) selectStation(id); });
+
+// theme changes
+function rethemed(){ readPalette(); renderAll(); }
+try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', rethemed); } catch (e) {}
+new MutationObserver(rethemed).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { sizeCanvas(); drawRaster(); }, 80); });
+
+/* ---------- boot ---------- */
+decode();
+readPalette();
+sizeCanvas();
+$('loading').remove();
+ysel.value = state.year;
+drawHeadline();
+drawTable();
+renderAll();
+})();
+</script>
+</body>
+</html>
